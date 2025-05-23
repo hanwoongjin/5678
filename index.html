@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatGPT로 알아보는 2025 대선 성향 테스트</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      color: #222;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #222;
+    }
+
+    .question {
+      margin: 20px 0;
+      background: #fff;
+      padding: 18px 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .question:hover {
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .options label {
+      display: block;
+      margin: 10px 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: color 0.2s ease;
+      user-select: none;
+    }
+
+    .options label:hover {
+      color: #007bff;
+    }
+
+    input[type="radio"] {
+      margin-right: 8px;
+      cursor: pointer;
+      accent-color: #007bff;
+      transform: scale(1.15);
+      vertical-align: middle;
+    }
+
+    button {
+      display: block;
+      margin: 40px auto 60px;
+      padding: 14px 28px;
+      font-size: 18px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 5px 12px rgba(0,123,255,0.4);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      box-shadow: 0 8px 20px rgba(0,86,179,0.6);
+    }
+
+    #result {
+      margin-top: 40px;
+      padding: 25px 30px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      line-height: 1.5;
+    }
+
+    .candidate-result {
+      margin-bottom: 35px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+    }
+
+    .candidate-result h3 {
+      margin-bottom: 8px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #007bff;
+    }
+
+    .bar {
+      height: 22px;
+      background: #4caf50;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 10px;
+      transition: width 0.6s ease-in-out;
+    }
+
+    .bar span {
+      position: absolute;
+      right: 10px;
+      top: 1px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    }
+
+    .candidate-result img {
+      max-width: 120px;
+      border-radius: 14px;
+      margin-top: 8px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+
+    .candidate-result a {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 14px;
+      background-color: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .candidate-result a:hover {
+      background-color: #0056b3;
+    }
+
+    .share-buttons {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .share-buttons a {
+      display: inline-block;
+      margin: 0 8px;
+      padding: 10px 15px;
+      background: #eee;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #555;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .share-buttons a:hover {
+      background-color: #007bff;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0,123,255,0.7);
+    }
+
+    /* SNS 별 색상 */
+    .share-twitter:hover { background-color: #1da1f2; color: white; }
+    .share-facebook:hover { background-color: #1877f2; color: white; }
+    .share-kakao:hover { background-color: #fee500; color: #3c1e1e; }
+    .share-linkedin:hover { background-color: #0a66c2; color: white; }
+
+    /* 반응형 */
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      button {
+        font-size: 16px;
+        padding: 12px 20px;
+      }
+      .candidate-result img {
+        max-width: 90px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>ChatGPT로 나의 21대 대선 후보 성향 알아보기</h1>
+  <form id="quizForm"></form>
+
+  <div id="result"></div>
+
+  <script>
+    const questions = [
+      "정부가 과학기술 연구개발에 적극 투자해야 한다.",
+      "지방 소멸을 막기 위해 수도권 규제가 필요하다.",
+      "국민연금 지급 연령을 높여야 한다.",
+      "기본소득 제도를 도입해야 한다.",
+      "탈원전 정책을 유지해야 한다.",
+      "부동산 보유세를 강화해야 한다.",
+      "외국인 투자 제한을 강화해야 한다.",
+      "주 4일제를 도입해야 한다.",
+      "청년층을 위한 무상 주택 공급이 필요하다.",
+      "북한과의 평화 협력이 우선이다.",
+      "기업에 대한 규제를 완화해야 한다.",
+      "공무원 수를 줄여야 한다.",
+      "사형제 폐지가 필요하다.",
+      "차별금지법은 반드시 제정해야 한다.",
+      "사립학교에 대한 자율성을 보장해야 한다.",
+      "종교단체 과세는 정당하다.",
+      "최저임금을 지역별로 차등 적용해야 한다.",
+      "디지털 플랫폼 노동자를 보호해야 한다.",
+      "출산 장려금보다 보육 인프라 확충이 우선이다.",
+      "군 복무 기간을 단축해야 한다."
+    ];
+
+    const options = [
+      ["매우 동의", "중립", "반대"],
+      ["필요하다", "중립", "불필요하다"],
+      ["동의한다", "중립", "반대한다"],
+      ["찬성", "중립", "반대"],
+      ["유지해야 한다", "중립", "폐지해야 한다"],
+      ["강화해야 한다", "중립", "약화해야 한다"],
+      ["강화해야 한다", "중립", "완화해야 한다"],
+      ["도입해야 한다", "중립", "시기상조다"],
+      ["필요하다", "중립", "불필요하다"],
+      ["우선이다", "중립", "억제해야 한다"],
+      ["완화해야 한다", "중립", "강화해야 한다"],
+      ["줄여야 한다", "중립", "유지해야 한다"],
+      ["폐지해야 한다", "중립", "유지해야 한다"],
+      ["제정해야 한다", "중립", "반대한다"],
+      ["보장해야 한다", "중립", "제한해야 한다"],
+      ["정당하다", "중립", "부당하다"],
+      ["찬성", "중립", "반대"],
+      ["보호해야 한다", "중립", "규제 최소화"],
+      ["인프라가 우선", "중립", "장려금이 우선"],
+      ["단축해야 한다", "중립", "현행 유지"]
+    ];
+
+    const weights = [
+      { "0": ["이재명", "권영국"], "1": [], "2": ["황교안", "김문수"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["이준석", "황교안", "김문수"] },
+      { "0": ["황교안", "김문수"], "1": [], "2": ["이재명", "권영국"] },
+      { "0": ["권영국", "이재명"], "1": [], "2": ["김문수", "황교안", "이준석"] },
+      { "0": ["권영국", "이재명"], "1": [], "2": ["김문수", "황교안"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["황교안", "김문수"] },
+      { "0": ["황교안", "김문수"], "1": [], "2": ["이재명", "권영국"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["김문수", "황교안"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["황교안", "김문수"] },
+      { "0": ["권영국", "이재명"], "1": [], "2": ["황교안", "김문수"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["황교안", "김문수"] },
+      { "0": ["황교안", "김문수"], "1": [], "2": ["이재명", "권영국"] },
+      { "0": ["권영국", "이재명"], "1": [], "2": ["김문수", "황교안"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["황교안", "김문수"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["김문수", "황교안"] },
+      { "0": ["권영국", "이재명"], "1": [], "2": ["김문수", "황교안"] },
+      { "0": ["황교안", "김문수"], "1": [], "2": ["이재명", "권영국"] },
+      { "0": ["권영국", "이재명"], "1": [], "2": ["김문수", "황교안"] },
+      { "0": ["이재명", "권영국"], "1": [], "2": ["황교안", "김문수"] },
+      { "0": ["권영국", "이재명"], "1": [], "2": ["김문수", "황교안"] }
+    ];
+const candidates = {
+  "이재명": {
+    img: "https://i.namu.wiki/i/ghOm559uKd6bnpL84DPuTiStPNZY4DcI_davse1QZgGYsCqj_hUBa0hoK2mvkglZ2HJASs5_4b820-A0xYxqTRwIpHSzzwl5eNHtUzRyQXoXb1agsuu6QIsgtw4uLczswtP_f5eMIZBdNEiL3Cw_YA.webp",
+    url: "https://ssl.pstatic.net/static.news/image/pdf/election/president2025/candidate/pledge/20250520/006_100153692.pdf"
+  },
+  "김문수": {
+    img: "https://i.namu.wiki/i/slv_GA4rjEMh7ICdTeIy6HUGtkMhUzYxR-qvXGv_paFWmdco-7ecgPwGt3oC9fNLmzwBTRMf643wT43QySRBDNeO0xYsdq_efmHjVrLbIDWIbS9A8Qw2ZGabstIRIXHEb1uJ9HwhRtjLdTyzyaj8-g.webp",
+    url: "https://ssl.pstatic.net/static.news/image/pdf/election/president2025/candidate/pledge/20250520/006_100153710.pdf"
+  },
+  "이준석": {
+    img: "https://i.namu.wiki/i/hOHl-VhVxEOv9v4lkGj3o_qGCSSt5rpRF9wCpWH3RioXhGKpzm0nNrtrCfHpJmB2XmeaMllMQInzHBOMkoco0hoVZ9ZlurWBkqqjQvOo9yr_nPZQG12FL7S8duLA168Dn59FRfwzVrR_L0RHC4tBuQ.webp",
+    url: "https://ssl.pstatic.net/static.news/image/pdf/election/president2025/candidate/pledge/20250520/006_100153689.pdf"
+  },
+  "권영국": {
+    img: "https://i.namu.wiki/i/yEeL6M9xFGwpWPgnU_vd3veV5N2hr_jIV-fyh3i4xwnrdTaPyglLx6Dg5TA0GYBON7qIcc5eN0zgqFNUwEG9FY3HxRoEVjLhI3WrhYDPtvQpKYKAieRPP6aKhK8SNotVvbhnnZPznNsit_BlmO2Xyg.webp",
+    url: "https://ssl.pstatic.net/static.news/image/pdf/election/president2025/candidate/pledge/20250520/006_100153725.pdf"
+  },
+  "황교안": {
+    img: "https://i.namu.wiki/i/SyqUwtGJ7y6GnmJMt8zi_FomfAEKeg1Nh00bin0qx5gRi-ah9qtp4IFakm4F2yt-voUvIpTQtRk0d0UxjCEq2lDmhAQ40MKnpUeurl9caEGK0HuAZKI_x8Ada6KL3_OSNFGwdggHUVMwbypsdU0FsQ.webp",
+    url: "https://ssl.pstatic.net/static.news/image/pdf/election/president2025/candidate/pledge/20250520/006_100153708.pdf"
+  },
+  "송진호": {
+    img: "https://i.namu.wiki/i/frEPiXDpuqvFZg__St8jBOTOXCafFWgNT3q6mJjZXb9aWC4cIPxdxGoed-sVewCA6b_1NaioqOPinzXYBCWlxcWCq7lJUFyP6VYNKrWaRrqjvYoZVH5XTIuWnBUFVpx45abInlIf87KxlA9FTliVtA.webp",
+    url: "https://ssl.pstatic.net/static.news/image/pdf/election/president2025/candidate/pledge/20250520/006_100153722.pdf"
+  }
+};
+
+const form = document.getElementById("quizForm");
+
+// 문제 생성
+questions.forEach((q, i) => {
+  const div = document.createElement("div");
+  div.classList.add("question");
+  div.innerHTML = `<p><strong>Q${i+1}.</strong> ${q}</p><div class="options"></div>`;
+  const optionsDiv = div.querySelector(".options");
+
+  options[i].forEach((opt, idx) => {
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="radio" name="q${i}" value="${idx}"/> ${opt}`;
+    optionsDiv.appendChild(label);
+  });
+
+  form.appendChild(div);
+});
+
+// 제출 버튼 추가
+const submitBtn = document.createElement("button");
+submitBtn.type = "submit";
+submitBtn.textContent = "결과 보기";
+form.appendChild(submitBtn);
+
+function showResult(scores) {
+  // 점수 최대값 계산 (최대 20문항)
+  // 점수 최대값 = 20 (각 문항에서 후보 점수 1점씩)
+  const maxScore = 20;
+
+  // 점수 순 정렬
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = `<h2>결과</h2>`;
+
+  sorted.forEach(([name, score]) => {
+    const percent = Math.round((score / maxScore) * 100);
+    const candidate = candidates[name];
+    const candidateDiv = document.createElement("div");
+    candidateDiv.classList.add("candidate-result");
+
+    candidateDiv.innerHTML = `
+      <h3>${name} - ${score}점 (${percent}%)</h3>
+      <div class="bar" style="width: ${percent}%;"><span>${percent}%</span></div>
+      <img src="${candidate.img}" alt="${name} 사진" />
+      <br/>
+      <a href="${candidate.url}" target="_blank" rel="noopener noreferrer">더 알아보기</a>
+    `;
+
+    resultDiv.appendChild(candidateDiv);
+  });
+
+  // SNS 공유 버튼 추가
+  const shareDiv = document.createElement("div");
+  shareDiv.classList.add("share-buttons");
+
+  const pageUrl = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent("2025 대선 성향 테스트 결과를 확인해보세요!");
+
+  // 트위터
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${text}&url=${pageUrl}`;
+  // 페이스북
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
+  // 카카오톡 - 웹에서는 url scheme 사용, 링크 복사 안내용으로 대체 가능
+  // 여기서는 모바일에서 작동 가능한 링크 제공
+  const kakaoUrl = `https://story.kakao.com/share?url=${pageUrl}`;
+  // 링크드인
+  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
+
+  shareDiv.innerHTML = `
+    <a href="${twitterUrl}" target="_blank" rel="noopener" class="share-twitter" aria-label="트위터 공유">🐦 트위터</a>
+    <a href="${facebookUrl}" target="_blank" rel="noopener" class="share-facebook" aria-label="페이스북 공유">📘 페이스북</a>
+    <a href="${kakaoUrl}" target="_blank" rel="noopener" class="share-kakao" aria-label="카카오톡 공유">💛 카카오톡</a>
+    <a href="${linkedinUrl}" target="_blank" rel="noopener" class="share-linkedin" aria-label="링크드인 공유">🔗 링크드인</a>
+  `;
+
+  resultDiv.appendChild(shareDiv);
+
+  // 결과로 스크롤 이동
+  resultDiv.scrollIntoView({behavior: "smooth"});
+}
+
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const scores = {
+    "이재명": 0,
+    "김문수": 0,
+    "이준석": 0,
+    "권영국": 0,
+    "황교안": 0,
+    "송진호": 0
+  };
+
+  for (let i = 0; i < questions.length; i++) {
+    const answerInput = form[`q${i}`];
+    if (!answerInput) continue;
+    const answer = answerInput.value;
+    if (answer === undefined) continue;
+
+    const selectedCandidates = weights[i][answer];
+    if (!selectedCandidates) continue;
+
+    selectedCandidates.forEach(name => {
+      if (scores[name] !== undefined) {
+        scores[name]++;
+      }
+    });
+  }
+
+  showResult(scores);
+});
+</script>
+
+</body>
+
+</html>
+
+ 
